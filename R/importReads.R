@@ -149,8 +149,6 @@ bam2GRanges <- function(bamfile, bamindex=bamfile, chromosomes=NULL, pairedEndRe
     }
 
     return(data)
->>>>>>> 0ef0b43 (init commit from ZIP)
-
 }
 
 
@@ -180,116 +178,6 @@ bam2GRanges <- function(bamfile, bamindex=bamfile, chromosomes=NULL, pairedEndRe
 #'
 bed2GRanges <- function(bedfile, assembly, chromosomes=NULL, remove.duplicate.reads=FALSE, min.mapq=10, max.fragment.width=1000, blacklist=NULL) {
 
-<<<<<<< HEAD
-  ## Input checks
-  if (!is.null(blacklist)) {
-      if ( !(is.character(blacklist) | class(blacklist)=='GRanges') ) {
-          stop("'blacklist' has to be either a bed(.gz) file or a GRanges object")
-      }
-  }
-
-  # File with reads, specify classes for faster import (0-based)
-  ptm <- startTimedMessage("Reading file ",basename(bedfile)," ...")
-  classes <- c('character','numeric','numeric','NULL','integer','character')
-  data.raw <- utils::read.table(bedfile, colClasses=classes)
-  # Convert to GRanges object
-  data <- GenomicRanges::GRanges(seqnames=data.raw[,1], ranges=IRanges(start=data.raw[,2]+1, end=data.raw[,3]), strand=data.raw[,5])    # start+1 to go from [0,x) -> [1,x]
-  mcols(data)$mapq <- data.raw[,4]
-  remove(data.raw)
-  stopTimedMessage(ptm)
-  ## Read chromosome length information
-  if (is.character(assembly)) {
-      if (file.exists(assembly)) {
-          df <- utils::read.table(assembly, sep='\t', header=TRUE)
-      } else {
-          ptm <- startTimedMessage("Fetching chromosome lengths from UCSC ...")
-          df.chroms <- GenomeInfoDb::getChromInfoFromUCSC(assembly)
-          stopTimedMessage(ptm)
-          df <- df.chroms[,c('chrom','size')]
-          if (grepl('^chr',seqlevels(data)[1])) {
-          } else {
-              df$chrom = sub('^chr', '', df$chrom)
-          }
-      }
-  } else if (is.data.frame(assembly)) {
-      df <- assembly
-  } else {
-      stop("'assembly' must be either a data.frame with columns 'chromosome' and 'length' or a character specifying the assembly.")
-  }
-  chrom.lengths <- df[,2]
-  names(chrom.lengths) <- df[,1]
-  seqlengths(data) <- as.numeric(chrom.lengths[names(seqlengths(data))])
-
-  chroms.in.data <- seqlevels(data)
-  if (is.null(chromosomes)) {
-      chromosomes <- chroms.in.data
-  }
-  chroms2use <- intersect(chromosomes, chroms.in.data)
-  ## Stop if none of the specified chromosomes exist
-  if (length(chroms2use)==0) {
-      chrstring <- paste0(chromosomes, collapse=', ')
-      stop('The specified chromosomes ', chrstring, ' do not exist in the data.')
-  }
-  ## Issue warning for non-existent chromosomes
-  diff <- setdiff(chromosomes, chroms.in.data)
-  if (length(diff)>0) {
-      diffs <- paste0(diff, collapse=', ')
-      warning(paste0('Not using chromosomes ', diffs, ' because they are not in the data.'))
-  }
-
-  ## Select only desired chromosomes
-  ptm <- startTimedMessage("Subsetting chromosomes ...")
-  data <- data[seqnames(data) %in% chroms2use]
-  data <- keepSeqlevels(data, as.character(unique(seqnames(data))))
-  ## Drop seqlevels where seqlength is NA
-  na.seqlevels <- seqlevels(data)[is.na(seqlengths(data))]
-  data <- data[seqnames(data) %in% seqlevels(data)[!is.na(seqlengths(data))]]
-  data <- keepSeqlevels(data, as.character(unique(seqnames(data))))
-  if (length(na.seqlevels) > 0) {
-      warning("Dropped seqlevels because no length information was available: ", paste0(na.seqlevels, collapse=', '))
-  }
-  stopTimedMessage(ptm)
-
-	if (length(data) == 0) {
-		stop(paste0('No reads imported!'))
-	}
-
-	## Filter by mapping quality
-	ptm <- startTimedMessage("Filtering reads ...")
-	if (!is.na(min.mapq)) {
-		if (any(is.na(mcols(data)$mapq))) {
-			warning(paste0(bedfile,": Reads with mapping quality NA (=255 in BAM file) found and removed. Set 'min.mapq=NA' to keep all reads."))
-			mcols(data)$mapq[is.na(mcols(data)$mapq)] <- -1
-		}
-		data <- data[mcols(data)$mapq >= min.mapq]
-	}
-	# Filter out too long fragments
-	data <- data[width(data)<=max.fragment.width]
-	stopTimedMessage(ptm)
-
-	## Exclude reads falling into blacklisted regions
-	if (!is.null(blacklist)) {
-		ptm <- startTimedMessage("Filtering blacklisted regions ...")
-		if (is.character(blacklist)) {
-			if (grepl('^chr', seqlevels(data)[1])) {
-				chromosome.format <- 'UCSC'
-			} else {
-				chromosome.format <- 'NCBI'
-			}
-			black <- importBed(blacklist, skip=0, chromosome.format=chromosome.format)
-		} else if (class(blacklist)=='GRanges') {
-			black <- blacklist
-		} else {
-			stop("'blacklist' has to be either a bed(.gz) file or a GRanges object")
-		}
-		overlaps <- findOverlaps(data, black)
-		idx <- setdiff(1:length(data), S4Vectors::queryHits(overlaps))
-		data <- data[idx]
-		stopTimedMessage(ptm)
-	}
-
-	return(data)
-=======
     ## Input checks
     if (!is.null(blacklist)) {
         if ( !(is.character(blacklist) | class(blacklist)=='GRanges') ) {
