@@ -289,12 +289,12 @@ if (length(files) == 1 & conf[['cluster.plots']] == TRUE) {
 }
 if (numcpu > 1) {
   ptm <- startTimedMessage("Binning the data ...")
-  temp <- foreach (file = files, .packages=c("AneuFinder")) %dopar% {
-    parallel.helper(file)
-  }
+  # temp <- foreach (file = files, .packages=c("AneuFinder")) %dopar% {
+    # parallel.helper(file)
+  # }
+  temp <- parallel::mclapply(files, parallel.helper, mc.cores=numcpu)
   stopTimedMessage(ptm)
 } else {
-  # temp <- foreach (file = files, .packages=c("AneuFinder")) %do% {
   for (file in files) {
     parallel.helper(file)
   }
@@ -315,12 +315,9 @@ if (!conf[['use.bamsignals']] & conf[['reads.store']]) {
   
   if (numcpu > 1) {
     ptm <- startTimedMessage("Saving reads as .RData ...")
-    temp <- foreach (file = files, .packages=c("AneuFinder")) %dopar% {
-      parallel.helper(file)
-    }
+    temp <- parallel::mclapply(files, parallel.helper, mc.cores=numcpu)
     stopTimedMessage(ptm)
   } else {
-    # temp <- foreach (file = files, .packages=c("AneuFinder")) %do% {
     for (file in files) {
       parallel.helper(file)
     }
@@ -344,12 +341,9 @@ if (!conf[['use.bamsignals']] & conf[['reads.store']]) {
   
   if (numcpu > 1) {
     ptm <- startTimedMessage("Exporting data as browser files ...")
-    temp <- foreach (file = readfiles, .packages=c("AneuFinder")) %dopar% {
-      parallel.helper(file)
-    }
+    temp <- parallel::mclapply(readfiles, parallel.helper, mc.cores=numcpu)
     stopTimedMessage(ptm)
   } else {
-    # temp <- foreach (file = readfiles, .packages=c("AneuFinder")) %do% {
     for (file in readfiles) {
       parallel.helper(file)
     }
@@ -398,13 +392,10 @@ if (!is.null(conf[['correction.method']])) {
       }
       if (numcpu > 1) {
         ptm <- startTimedMessage(paste0(correction.method," correction ..."))
-        temp <- foreach (pattern = patterns, .packages=c("AneuFinder")) %dopar% {
-          parallel.helper(pattern)
-        }
+        temp <- parallel::mclapply(patterns, parallel.helper, mc.cores=numcpu)
         stopTimedMessage(ptm)
       } else {
         ptm <- startTimedMessage(paste0(correction.method," correction ..."))
-        # temp <- foreach (pattern = patterns, .packages=c("AneuFinder")) %do% {
         for (pattern in patterns) {
           parallel.helper(pattern)
         }
@@ -480,12 +471,9 @@ for (method in conf[['method']]) {
         } else if (method == 'edivisive') {
             ptm <- startTimedMessage("Running edivisive ...")
         }
-        temp <- foreach (file = files, .packages=c("AneuFinder")) %dopar% {
-            parallel.helper(file)
-        }
+        temp <- parallel::mclapply(files, parallel.helper, mc.cores=numcpu)
         stopTimedMessage(ptm)
       } else {
-          # temp <- foreach (file = files, .packages=c("AneuFinder")) %do% {
           for (file in files) {
               parallel.helper(file)
           }
@@ -517,12 +505,9 @@ for (method in conf[['method']]) {
         }
         if (numcpu > 1) {
             ptm <- startTimedMessage("Refining breakpoints ...")
-            temp <- foreach (file = files, .packages=c("AneuFinder")) %dopar% {
-                parallel.helper(file)
-            }
+            temp <- parallel::mclapply(files, parallel.helper, mc.cores=numcpu)
             stopTimedMessage(ptm)
         } else {
-            # temp <- foreach (file = files, .packages=c("AneuFinder")) %do% {
             for (file in files) {
                 parallel.helper(file)
             }
@@ -556,9 +541,11 @@ for (method in conf[['method']]) {
         }
         if (numcpu > 1) {
             ptm <- startTimedMessage("Finding breakpoint hotspots ...")
-            hslist <- foreach (pattern = patterns, .packages=c("AneuFinder")) %dopar% {
-                parallel.helper(pattern)
-            }
+            # hslist <- foreach (pattern = patterns, .packages=c("AneuFinder")) %dopar% {
+                # parallel.helper(pattern)
+            # }
+            # HACK:
+            hslist <- parallel::mclapply(patterns, parallel.helper, mc.cores=numcpu)
             stopTimedMessage(ptm)
         } else {
             ptm <- startTimedMessage("Finding breakpoint hotspots ...")

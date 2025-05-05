@@ -48,7 +48,8 @@ filterSegments <- function(segments, min.seg.width) {
 	segments.filtered <- as(segments.df, 'GRanges')
 	seqlevels(segments.filtered) <- seqlevels(segments) # correct order after as()
 	seqlengths(segments.filtered) <- seqlengths(segments)
-	return(segments)
+    # BUG: Orignial code return the "segments"
+	return(segments.filtered)
 }
 
 #' Get SCE coordinates

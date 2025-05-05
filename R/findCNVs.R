@@ -26,6 +26,10 @@
 findCNVs <- function(binned.data, ID=NULL, method="edivisive", strand='*', R=10, sig.lvl=0.1, eps=0.01, init="standard", max.time=-1, max.iter=1000, num.trials=15, eps.try=max(10*eps, 1), num.threads=1, count.cutoff.quantile=0.999, states=c("zero-inflation",paste0(0:10,"-somy")), most.frequent.state="2-somy", algorithm="EM", initial.params=NULL, verbosity=1) {
 
 	## Intercept user input
+<<<<<<< HEAD
+=======
+    # HACK:
+>>>>>>> 0ef0b43 (init commit from ZIP)
   binned.data <- loadFromFiles(binned.data, check.class=c('GRanges', 'GRangesList'))[[1]]
 	if (is.null(ID)) {
 		ID <- attr(binned.data, 'ID')
@@ -50,6 +54,10 @@ findCNVs <- function(binned.data, ID=NULL, method="edivisive", strand='*', R=10,
 	} else if (method == 'dnacopy') {
 	  model <- DNAcopy.findCNVs(binned.data, ID, CNgrid.start=1.5, strand=strand)
 	} else if (method == 'edivisive') {
+<<<<<<< HEAD
+=======
+      # HACK: change the CNgrid.start value can change the break points
+>>>>>>> 0ef0b43 (init commit from ZIP)
 	  model <- edivisive.findCNVs(binned.data, ID, CNgrid.start=1.5, strand=strand, R=R, sig.lvl=sig.lvl)
 	}
 
